@@ -1,8 +1,11 @@
 import express from 'express';
-import { updatePassword } from '../controllers/authController';
+import { signup,login, updatePassword } from '../controllers/authController';
 
 const router = express.Router();
 
+
+router.post('/login', login);
+router.post('/signup', signup);
 router.post('/reset-password', updatePassword);
 
 export default router;

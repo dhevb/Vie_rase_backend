@@ -3,6 +3,6 @@ import { submitManuscript } from '../controllers/manuscriptController';
 
 const router = express.Router();
 
-router.post('/', submitManuscript);
+router.post('/submit_manuscript', submitManuscript);
 
 export default router;
