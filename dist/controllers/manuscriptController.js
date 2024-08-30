@@ -9,16 +9,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.submitManuscript = void 0;
+exports.submitArticleDetails = exports.submitManuscriptFile = void 0;
 const manuscriptModel_1 = require("../models/manuscriptModel");
-const submitManuscript = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
-    const { title, abstract, file_path, author_id } = req.body;
+// Endpoint to handle manuscript file submission
+const submitManuscriptFile = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { author_id } = req.body;
+    const file = req.file;
+    if (!file) {
+        return res.status(400).json({ error: 'No file uploaded' });
+    }
+    const file_path = file.path;
     try {
-        const result = yield (0, manuscriptModel_1.createManuscript)({ title, abstract, file_path, author_id });
+        // Create a new manuscript entry with file_path and author_id
+        const result = yield (0, manuscriptModel_1.createManuscript)({ file_path, author_id });
         res.status(201).json({ id: result.insertId });
     }
     catch (error) {
-        res.status(400).json({ error: 'Error submitting manuscript' });
+        res.status(400).json({ error: 'Error submitting manuscript file' });
     }
 });
-exports.submitManuscript = submitManuscript;
+exports.submitManuscriptFile = submitManuscriptFile;
+// Endpoint to handle article details submission
+const submitArticleDetails = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    const { id, title, abstract, category } = req.body;
+    try {
+        // Check if the manuscript exists
+        const manuscript = yield (0, manuscriptModel_1.getManuscriptById)(id);
+        if (!manuscript) {
+            return res.status(404).json({ error: 'Manuscript not found' });
+        }
+        // Update the manuscript with article details
+        yield (0, manuscriptModel_1.updateManuscriptDetails)(id, { title, abstract, category });
+        res.status(200).json({ message: 'Article details updated successfully' });
+    }
+    catch (error) {
+        res.status(400).json({ error: 'Error updating article details' });
+    }
+});
+exports.submitArticleDetails = submitArticleDetails;

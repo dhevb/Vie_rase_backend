@@ -1,29 +1,45 @@
-import { RowDataPacket, ResultSetHeader } from 'mysql2';
+import { Pool, ResultSetHeader } from 'mysql2/promise';
+import {pool} from '../utils/db'; // Ensure the path is correct
 
-// Adjust import based on your actual export in `db.ts`
-import {pool} from '../utils/db';
-
+// Define the Manuscript interface
 interface Manuscript {
   id: number;
-  title: string;
-  abstract: string;
   file_path: string;
   author_id: number;
-  created_at: Date;
-  updated_at: Date;
+  title?: string;
+  abstract?: string;
+  category?: string;
 }
 
-export const getManuscriptById = async (id: number): Promise<Manuscript | null> => {
-  const [rows] = await pool.query<RowDataPacket[]>('SELECT * FROM manuscripts WHERE id = ?', [id]);
-  return rows.length > 0 ? (rows[0] as Manuscript) : null;
-};
-
+// Create a new manuscript record
 export const createManuscript = async (manuscript: {
-  title: string;
-  abstract: string;
   file_path: string;
   author_id: number;
+  title?: string;
+  abstract?: string;
+  category?: string;
 }) => {
-  const [result] = await pool.query<ResultSetHeader>('INSERT INTO manuscripts SET ?', [manuscript]);
+  const [result] = await pool.query<ResultSetHeader>(
+    'INSERT INTO manuscripts (file_path, author_id, title, abstract, category) VALUES (?, ?, ?, ?, ?)',
+    [manuscript.file_path, manuscript.author_id, manuscript.title || null, manuscript.abstract || null, manuscript.category || null]
+  );
   return result;
+};
+
+// Get a manuscript by its ID
+export const getManuscriptById = async (id: number): Promise<Manuscript | null> => {
+  const [rows] = await pool.query('SELECT * FROM manuscripts WHERE id = ?', [id]);
+  return (rows as Manuscript[])[0] || null;
+};
+
+// Update the manuscript details
+export const updateManuscriptDetails = async (id: number, details: {
+  title?: string;
+  abstract?: string;
+  category?: string;
+}) => {
+  await pool.query(
+    'UPDATE manuscripts SET title = ?, abstract = ?, category = ? WHERE id = ?',
+    [details.title || null, details.abstract || null, details.category || null, id]
+  );
 };

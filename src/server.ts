@@ -5,7 +5,8 @@ import { connectToDatabase } from './utils/db'; // Adjust the path as needed
 import {login} from './controllers/authController';
 import {signup} from './controllers/authController';
 import { updatePassword } from './controllers/authController';
-import { submitManuscript } from './controllers/manuscriptController';
+import { submitManuscriptFile } from './controllers/manuscriptController';
+import { submitArticleDetails } from './controllers/manuscriptController';
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -14,7 +15,8 @@ app.use(express.json());
 
 // Import your routes here
 app.use('/reset-password', updatePassword);
-app.use('/submit_manuscript', submitManuscript);
+app.use('/submit-manuscript-file', submitManuscriptFile);
+app.use('/submit-article-details', submitArticleDetails);
 app.use('/login', login);
 app.use('/signup', signup);
 app.use('/reset-password', updatePassword);
