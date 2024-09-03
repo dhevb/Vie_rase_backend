@@ -12,10 +12,12 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updatePassword = exports.login = exports.signup = void 0;
+exports.logout = exports.updatePassword = exports.login = exports.checkAuth = exports.signup = void 0;
 const bcrypt_1 = __importDefault(require("bcrypt"));
 const db_1 = require("../utils/db"); // Ensure this path is correct
 const authUtils_1 = require("../utils/authUtils"); // Import your token generation utility
+const tokenUtils_1 = require("../utils/tokenUtils"); // Import your token blacklisting utility
+// Signup function
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password, institution, role, areaOfStudy } = req.body;
     if (!email || !password || !institution || !role || !areaOfStudy) {
@@ -44,7 +46,13 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 exports.signup = signup;
-// Function to handle user login
+// Check authentication status
+const checkAuth = (req, res) => {
+    // The verifyTokenMiddleware will attach the user info to req.user
+    res.status(200).json({ message: 'User is logged in', user: req.user });
+};
+exports.checkAuth = checkAuth;
+// Handle user login
 const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -59,13 +67,21 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         // Generate authentication token
         const token = (0, authUtils_1.generateToken)(user.id);
-        res.json({ token });
+        res.json({
+            token,
+            userId: user.id,
+            email: user.email,
+            institution: user.institution,
+            role: user.role,
+            areaOfStudy: user.area_of_study
+        });
     }
     catch (error) {
         res.status(500).json({ error: 'Error logging in' });
     }
 });
 exports.login = login;
+// Update password
 const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const { email, newPassword } = req.body;
     if (!email || !newPassword) {
@@ -81,3 +97,27 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
     }
 });
 exports.updatePassword = updatePassword;
+// Logout function
+const logout = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    // Extract token from Authorization header
+    const token = (_a = req.headers.authorization) === null || _a === void 0 ? void 0 : _a.split(' ')[1]; // Extract token from Bearer <token>
+    if (token) {
+        try {
+            // Optional: Blacklist the token to prevent further use
+            yield (0, tokenUtils_1.blacklistToken)(token); // Add this token to the blacklist or perform server-side cleanup
+            // Send response indicating successful logout
+            res.status(200).json({ message: 'Logged out successfully' });
+        }
+        catch (error) {
+            // Handle errors, possibly related to token blacklisting
+            console.error('Error during logout:', error);
+            res.status(500).json({ error: 'Error logging out' });
+        }
+    }
+    else {
+        // Handle case where no token is provided
+        res.status(400).json({ error: 'No token provided' });
+    }
+});
+exports.logout = logout;

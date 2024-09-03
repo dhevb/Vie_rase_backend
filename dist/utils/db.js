@@ -28,7 +28,7 @@ exports.pool = pool;
 const connectToDatabase = () => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const connection = yield pool.getConnection();
-        console.log('Database connected successfully');
+        console.log('Database connected successfully at', process.env.DB_PORT);
         connection.release(); // Release the connection back to the pool
     }
     catch (error) {

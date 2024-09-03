@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 import { getUserByEmail, getUserById } from '../models/userModel';
-
 export const getUserDetailsEmail = async (req: Request, res: Response) => {
   const { email } = req.params;
 
@@ -16,6 +15,8 @@ export const getUserDetailsEmail = async (req: Request, res: Response) => {
     res.status(400).json({ error: 'Error retrieving user details' });
   }
 }
+
+
 export const getUserDetailsId = async (req: Request, res: Response) => {
   const {id } = req.params;
 

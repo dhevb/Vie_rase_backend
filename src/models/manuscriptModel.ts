@@ -1,45 +1,54 @@
-import { Pool, ResultSetHeader } from 'mysql2/promise';
-import {pool} from '../utils/db'; // Ensure the path is correct
+import { Pool } from 'mysql2/promise';
+import { pool } from '../utils/db'; // Adjust path as necessary
 
-// Define the Manuscript interface
-interface Manuscript {
-  id: number;
-  file_path: string;
-  author_id: number;
-  title?: string;
-  abstract?: string;
-  category?: string;
-}
-
-// Create a new manuscript record
-export const createManuscript = async (manuscript: {
-  file_path: string;
-  author_id: number;
-  title?: string;
-  abstract?: string;
-  category?: string;
+export const submitAuthorDetails = async (data: {
+  author_name: string;
+  author_email: string;
+  author_designation: string;
+  author_organization: string;
+  author_mobile: string;
+  co_authors: Array<{
+    name: string;
+    email: string;
+    designation: string;
+    organization: string;
+    mobile: string;
+  }>;
+  user_id: string;
 }) => {
-  const [result] = await pool.query<ResultSetHeader>(
-    'INSERT INTO manuscripts (file_path, author_id, title, abstract, category) VALUES (?, ?, ?, ?, ?)',
-    [manuscript.file_path, manuscript.author_id, manuscript.title || null, manuscript.abstract || null, manuscript.category || null]
+  // Insert author and co-author details into the database
+  const [result] = await pool.query(
+    'INSERT INTO manuscript (author_name, author_email, author_designation, author_organization, author_mobile, userId) VALUES (?, ?, ?, ?, ?, ?)',
+    [data.author_name, data.author_email, data.author_designation, data.author_organization, data.author_mobile, data.user_id]
   );
-  return result;
+
+  const manuscriptId = (result as any).insertId;
+
+  // Insert co-authors
+  for (const coAuthor of data.co_authors) {
+    await pool.query(
+      'INSERT INTO co_authors (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)',
+      [manuscriptId, coAuthor.name, coAuthor.email, coAuthor.designation, coAuthor.organization, coAuthor.mobile]
+    );
+  }
+
+  return { manuscriptId };
 };
 
-// Get a manuscript by its ID
-export const getManuscriptById = async (id: number): Promise<Manuscript | null> => {
-  const [rows] = await pool.query('SELECT * FROM manuscripts WHERE id = ?', [id]);
-  return (rows as Manuscript[])[0] || null;
-};
-
-// Update the manuscript details
-export const updateManuscriptDetails = async (id: number, details: {
-  title?: string;
-  abstract?: string;
-  category?: string;
-}) => {
+// Function to update manuscript file details
+export const updateManuscriptFile = async (manuscriptId: number, filePath: string, user_id: string) => {
+  // Update the manuscript record with the provided file path and userId
   await pool.query(
-    'UPDATE manuscripts SET title = ?, abstract = ?, category = ? WHERE id = ?',
-    [details.title || null, details.abstract || null, details.category || null, id]
+    'UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?',
+    [filePath, user_id, manuscriptId]
+  );
+};
+
+// Function to update article details
+export const updateArticleDetails = async (manuscriptId: number, details: any, user_id: string) => {
+  // Update the manuscript record with the provided article details and userId
+  await pool.query(
+    'UPDATE manuscript SET title = ?, abstract = ?, category = ?, userId = ? WHERE id = ?',
+    [details.title, details.abstract, details.category, user_id, manuscriptId]
   );
 };

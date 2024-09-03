@@ -16,15 +16,14 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage,
   fileFilter: (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-    // Allow only Word documents
     const allowedTypes = /doc|docx/;
     const extname = allowedTypes.test(path.extname(file.originalname).toLowerCase());
     const mimetype = allowedTypes.test(file.mimetype);
-
+  
     if (mimetype && extname) {
       return cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only DOC and DOCX files are allowed.'));
+      return cb(new Error('Invalid file type. Only DOC and DOCX files are allowed.'));
     }
   },
 });

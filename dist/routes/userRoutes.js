@@ -7,5 +7,5 @@ const express_1 = __importDefault(require("express"));
 const userController_1 = require("../controllers/userController");
 const router = express_1.default.Router();
 router.get('/getuser:email', userController_1.getUserDetailsEmail);
-router.get('/getuser:id', userController_1.getUserDetailsId);
+router.get('/api/getuser:id', userController_1.getUserDetailsId);
 exports.default = router;

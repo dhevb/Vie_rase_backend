@@ -1,18 +1,12 @@
-import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
+// utils/tokenUtils.ts
+import { pool } from './db'; // Import database connection
 
-dotenv.config();
-
-export const generateToken = (userId: number) => {
-  return jwt.sign({ userId }, process.env.JWT_SECRET_KEY as string, {
-    expiresIn: '1h', // Token expiration time
-  });
-};
-
-export const verifyToken = (token: string) => {
+export const blacklistToken = async (token: string) => {
   try {
-    return jwt.verify(token, process.env.JWT_SECRET_KEY as string);
+    // Example implementation: Insert the token into a blacklist table
+    await pool.query('INSERT INTO token_blacklist (token) VALUES (?)', [token]);
   } catch (error) {
-    throw new Error('Invalid token');
+    console.error('Error blacklisting token:', error);
+    throw new Error('Error blacklisting token');
   }
 };

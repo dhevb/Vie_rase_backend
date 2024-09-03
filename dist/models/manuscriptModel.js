@@ -9,22 +9,28 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateManuscriptDetails = exports.getManuscriptById = exports.createManuscript = void 0;
-const db_1 = require("../utils/db"); // Ensure the path is correct
-// Create a new manuscript record
-const createManuscript = (manuscript) => __awaiter(void 0, void 0, void 0, function* () {
-    const [result] = yield db_1.pool.query('INSERT INTO manuscripts (file_path, author_id, title, abstract, category) VALUES (?, ?, ?, ?, ?)', [manuscript.file_path, manuscript.author_id, manuscript.title || null, manuscript.abstract || null, manuscript.category || null]);
-    return result;
+exports.updateArticleDetails = exports.updateManuscriptFile = exports.submitAuthorDetails = void 0;
+const db_1 = require("../utils/db"); // Adjust path as necessary
+const submitAuthorDetails = (data) => __awaiter(void 0, void 0, void 0, function* () {
+    // Insert author and co-author details into the database
+    const [result] = yield db_1.pool.query('INSERT INTO manuscript (author_name, author_email, author_designation, author_organization, author_mobile, userId) VALUES (?, ?, ?, ?, ?, ?)', [data.author_name, data.author_email, data.author_designation, data.author_organization, data.author_mobile, data.user_id]);
+    const manuscriptId = result.insertId;
+    // Insert co-authors
+    for (const coAuthor of data.co_authors) {
+        yield db_1.pool.query('INSERT INTO co_authors (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)', [manuscriptId, coAuthor.name, coAuthor.email, coAuthor.designation, coAuthor.organization, coAuthor.mobile]);
+    }
+    return { manuscriptId };
 });
-exports.createManuscript = createManuscript;
-// Get a manuscript by its ID
-const getManuscriptById = (id) => __awaiter(void 0, void 0, void 0, function* () {
-    const [rows] = yield db_1.pool.query('SELECT * FROM manuscripts WHERE id = ?', [id]);
-    return rows[0] || null;
+exports.submitAuthorDetails = submitAuthorDetails;
+// Function to update manuscript file details
+const updateManuscriptFile = (manuscriptId, filePath, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Update the manuscript record with the provided file path and userId
+    yield db_1.pool.query('UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?', [filePath, user_id, manuscriptId]);
 });
-exports.getManuscriptById = getManuscriptById;
-// Update the manuscript details
-const updateManuscriptDetails = (id, details) => __awaiter(void 0, void 0, void 0, function* () {
-    yield db_1.pool.query('UPDATE manuscripts SET title = ?, abstract = ?, category = ? WHERE id = ?', [details.title || null, details.abstract || null, details.category || null, id]);
+exports.updateManuscriptFile = updateManuscriptFile;
+// Function to update article details
+const updateArticleDetails = (manuscriptId, details, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Update the manuscript record with the provided article details and userId
+    yield db_1.pool.query('UPDATE manuscript SET title = ?, abstract = ?, category = ?, userId = ? WHERE id = ?', [details.title, details.abstract, details.category, user_id, manuscriptId]);
 });
-exports.updateManuscriptDetails = updateManuscriptDetails;
+exports.updateArticleDetails = updateArticleDetails;

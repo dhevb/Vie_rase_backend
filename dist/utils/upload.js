@@ -18,7 +18,6 @@ const storage = multer_1.default.diskStorage({
 const upload = (0, multer_1.default)({
     storage,
     fileFilter: (req, file, cb) => {
-        // Allow only Word documents
         const allowedTypes = /doc|docx/;
         const extname = allowedTypes.test(path_1.default.extname(file.originalname).toLowerCase());
         const mimetype = allowedTypes.test(file.mimetype);
@@ -26,7 +25,7 @@ const upload = (0, multer_1.default)({
             return cb(null, true);
         }
         else {
-            cb(new Error('Invalid file type. Only DOC and DOCX files are allowed.'));
+            return cb(new Error('Invalid file type. Only DOC and DOCX files are allowed.'));
         }
     },
 });

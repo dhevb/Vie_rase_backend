@@ -4,6 +4,6 @@ import { getUserDetailsEmail,getUserDetailsId } from '../controllers/userControl
 const router = express.Router();
 
 router.get('/getuser:email', getUserDetailsEmail);
-router.get('/getuser:id', getUserDetailsId);
+router.get('/api/getuser:id', getUserDetailsId);
 
 export default router;

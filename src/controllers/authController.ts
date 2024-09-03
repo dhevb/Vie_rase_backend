@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import { pool } from '../utils/db'; // Ensure this path is correct
 import { generateToken } from '../utils/authUtils'; // Import your token generation utility
+import { blacklistToken } from '../utils/tokenUtils'; // Import your token blacklisting utility
 
+// Signup function
 export const signup = async (req: Request, res: Response) => {
   const { email, password, institution, role, areaOfStudy } = req.body;
 
@@ -35,7 +37,13 @@ export const signup = async (req: Request, res: Response) => {
   }
 }
 
-// Function to handle user login
+// Check authentication status
+export const checkAuth = (req: Request, res: Response) => {
+  // The verifyTokenMiddleware will attach the user info to req.user
+  res.status(200).json({ message: 'User is logged in', user: (req as any).user });
+};
+
+// Handle user login
 export const login = async (req: Request, res: Response) => {
   const { email, password } = req.body;
 
@@ -54,11 +62,20 @@ export const login = async (req: Request, res: Response) => {
 
     // Generate authentication token
     const token = generateToken(user.id);
-    res.json({ token });
+    res.json({
+      token,
+      userId: user.id,
+      email: user.email,
+      institution: user.institution,
+      role: user.role,
+      areaOfStudy: user.area_of_study
+    });
   } catch (error) {
     res.status(500).json({ error: 'Error logging in' });
   }
 }
+
+// Update password
 export const updatePassword = async (req: Request, res: Response) => {
   const { email, newPassword } = req.body;
 
@@ -73,5 +90,27 @@ export const updatePassword = async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
+}
 
-};
+// Logout function
+export const logout = async (req: Request, res: Response) => {
+  // Extract token from Authorization header
+  const token = req.headers.authorization?.split(' ')[1]; // Extract token from Bearer <token>
+
+  if (token) {
+    try {
+      // Optional: Blacklist the token to prevent further use
+      await blacklistToken(token); // Add this token to the blacklist or perform server-side cleanup
+
+      // Send response indicating successful logout
+      res.status(200).json({ message: 'Logged out successfully' });
+    } catch (error) {
+      // Handle errors, possibly related to token blacklisting
+      console.error('Error during logout:', error);
+      res.status(500).json({ error: 'Error logging out' });
+    }
+  } else {
+    // Handle case where no token is provided
+    res.status(400).json({ error: 'No token provided' });
+  }
+}
