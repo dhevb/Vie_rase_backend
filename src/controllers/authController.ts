@@ -62,18 +62,21 @@ export const login = async (req: Request, res: Response) => {
 
     // Generate authentication token
     const token = generateToken(user.id);
+
+    // Respond with user details and token
     res.json({
       token,
       userId: user.id,
       email: user.email,
       institution: user.institution,
       role: user.role,
-      areaOfStudy: user.area_of_study
+      areaOfStudy: user.area_of_study,
     });
   } catch (error) {
+    console.error('Error logging in:', error);
     res.status(500).json({ error: 'Error logging in' });
   }
-}
+};
 
 // Update password
 export const updatePassword = async (req: Request, res: Response) => {
