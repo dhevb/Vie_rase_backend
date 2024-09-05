@@ -67,16 +67,18 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         }
         // Generate authentication token
         const token = (0, authUtils_1.generateToken)(user.id);
+        // Respond with user details and token
         res.json({
             token,
             userId: user.id,
             email: user.email,
             institution: user.institution,
             role: user.role,
-            areaOfStudy: user.area_of_study
+            areaOfStudy: user.area_of_study,
         });
     }
     catch (error) {
+        console.error('Error logging in:', error);
         res.status(500).json({ error: 'Error logging in' });
     }
 });
