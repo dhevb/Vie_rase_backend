@@ -10,7 +10,7 @@ export const signup = async (req: Request, res: Response) => {
 
   if (!email || !password || !institution || !role || !areaOfStudy) {
     return res.status(400).json({ error: 'All fields are required' });
-  
+  }
 
   try {
     // Check if user already exists
