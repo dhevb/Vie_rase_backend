@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs'; // Updated to use bcryptjs
 import { pool } from '../utils/db'; // Ensure this path is correct
 import { generateToken } from '../utils/authUtils'; // Import your token generation utility
 import { blacklistToken } from '../utils/tokenUtils'; // Import your token blacklisting utility

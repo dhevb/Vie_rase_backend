@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.updatePassword = exports.login = exports.checkAuth = exports.signup = void 0;
-const bcryptjs_1 = __importDefault(require("bcryptjs"));
+const bcryptjs_1 = __importDefault(require("bcryptjs")); // Updated to use bcryptjs
 const db_1 = require("../utils/db"); // Ensure this path is correct
 const authUtils_1 = require("../utils/authUtils"); // Import your token generation utility
 const tokenUtils_1 = require("../utils/tokenUtils"); // Import your token blacklisting utility

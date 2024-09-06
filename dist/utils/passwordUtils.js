@@ -13,10 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.generateRandomPassword = exports.hashPassword = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const saltRounds = 10;
 const hashPassword = (password) => __awaiter(void 0, void 0, void 0, function* () {
-    return yield bcrypt_1.default.hash(password, saltRounds);
+    return yield bcryptjs_1.default.hash(password, saltRounds);
 });
 exports.hashPassword = hashPassword;
 const generateRandomPassword = () => {
