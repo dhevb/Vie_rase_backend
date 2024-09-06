@@ -6,10 +6,11 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const manuscriptController_1 = require("../controllers/manuscriptController");
-// Setup multer for file uploads
+// Configure multer to use memory storage
+const storage = multer_1.default.memoryStorage();
 const upload = (0, multer_1.default)({
-    dest: 'uploads/',
-    limits: { fileSize: 100 * 1024 * 1024 }, // 10 MB
+    storage: storage,
+    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB
     fileFilter(req, file, cb) {
         if (file.mimetype !== 'application/msword' && file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
             return cb(new Error('Only .doc and .docx files are allowed'));

@@ -36,14 +36,18 @@ export const submitAuthorDetails = async (data: {
 };
 
 // Function to update manuscript file details
-export const updateManuscriptFile = async (manuscriptId: number, filePath: string, user_id: string) => {
-  // Update the manuscript record with the provided file path and userId
-  await pool.query(
-    'UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?',
-    [filePath, user_id, manuscriptId]
-  );
+export const updateManuscriptFile = async (manuscriptId: number, fileBuffer: Buffer, user_id: string) => {
+  try {
+    // Save the buffer to a database field (requires BLOB or similar data type)
+    await pool.query(
+      'UPDATE manuscript SET file_data = ?, userId = ? WHERE id = ?',
+      [fileBuffer, user_id, manuscriptId]
+    );
+  } catch (err) {
+    console.error('Error updating manuscript file:', err);
+    throw new Error('An error occurred while updating the manuscript file.');
+  }
 };
-
 // Function to update article details
 export const updateArticleDetails = async (manuscriptId: number, details: any, user_id: string) => {
   // Update the manuscript record with the provided article details and userId

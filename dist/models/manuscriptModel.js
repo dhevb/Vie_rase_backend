@@ -23,9 +23,15 @@ const submitAuthorDetails = (data) => __awaiter(void 0, void 0, void 0, function
 });
 exports.submitAuthorDetails = submitAuthorDetails;
 // Function to update manuscript file details
-const updateManuscriptFile = (manuscriptId, filePath, user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    // Update the manuscript record with the provided file path and userId
-    yield db_1.pool.query('UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?', [filePath, user_id, manuscriptId]);
+const updateManuscriptFile = (manuscriptId, fileBuffer, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        // Save the buffer to a database field (requires BLOB or similar data type)
+        yield db_1.pool.query('UPDATE manuscript SET file_data = ?, userId = ? WHERE id = ?', [fileBuffer, user_id, manuscriptId]);
+    }
+    catch (err) {
+        console.error('Error updating manuscript file:', err);
+        throw new Error('An error occurred while updating the manuscript file.');
+    }
 });
 exports.updateManuscriptFile = updateManuscriptFile;
 // Function to update article details
