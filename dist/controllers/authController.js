@@ -13,7 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.logout = exports.updatePassword = exports.login = exports.checkAuth = exports.signup = void 0;
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const bcryptjs_1 = __importDefault(require("bcryptjs"));
 const db_1 = require("../utils/db"); // Ensure this path is correct
 const authUtils_1 = require("../utils/authUtils"); // Import your token generation utility
 const tokenUtils_1 = require("../utils/tokenUtils"); // Import your token blacklisting utility
@@ -30,7 +30,7 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
             return res.status(400).json({ error: 'User already exists' });
         }
         // Hash the password
-        const hashedPassword = yield bcrypt_1.default.hash(password, 13);
+        const hashedPassword = yield bcryptjs_1.default.hash(password, 13);
         // Insert new user into the database
         const [result] = yield db_1.pool.query('INSERT INTO users (email, password, institution, role, area_of_study) VALUES (?, ?, ?, ?, ?)', [
             email,
@@ -62,7 +62,7 @@ const login = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         // Fetch user from the database
         const [rows] = yield db_1.pool.query('SELECT * FROM users WHERE email = ?', [email]);
         const user = rows[0];
-        if (!user || !(yield bcrypt_1.default.compare(password, user.password))) {
+        if (!user || !(yield bcryptjs_1.default.compare(password, user.password))) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
         // Generate authentication token
@@ -90,7 +90,7 @@ const updatePassword = (req, res) => __awaiter(void 0, void 0, void 0, function*
         return res.status(400).json({ error: 'Email and new password are required' });
     }
     try {
-        const hashedPassword = yield bcrypt_1.default.hash(newPassword, 10);
+        const hashedPassword = yield bcryptjs_1.default.hash(newPassword, 10);
         yield db_1.pool.query('UPDATE users SET password = ? WHERE email = ?', [hashedPassword, email]);
         res.status(200).json({ message: 'Password updated successfully' });
     }
