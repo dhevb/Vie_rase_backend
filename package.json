@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "dist/server.js",
   "scripts": {
+    "vercel":"vercel build"
     "build": "tsc",
     "start": "nodemon dist/server.js",
     "dev": "ts-nodemon src/server.ts"
