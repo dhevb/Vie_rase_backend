@@ -1,7 +1,6 @@
 import { Pool } from 'mysql2/promise';
 import { pool } from '../utils/db'; // Adjust path as necessary
 
-// Function to submit author and co-author details
 export const submitAuthorDetails = async (data: {
   author_name: string;
   author_email: string;
@@ -25,7 +24,7 @@ export const submitAuthorDetails = async (data: {
 
   const manuscriptId = (result as any).insertId;
 
-  // Insert co-authors into the co_authors table
+  // Insert co-authors
   for (const coAuthor of data.co_authors) {
     await pool.query(
       'INSERT INTO co_authors (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)',
@@ -36,18 +35,13 @@ export const submitAuthorDetails = async (data: {
   return { manuscriptId };
 };
 
-// Function to update manuscript file details with Vercel Blob URL
-export const updateManuscriptFile = async (manuscriptId: number, fileUrl: string, user_id: string) => {
-  try {
-    // Update the manuscript table with the file URL instead of the file buffer
-    await pool.query(
-      'UPDATE manuscript SET filePath = ?, userId = ? WHERE id = ?',
-      [fileUrl, user_id, manuscriptId]
-    );
-  } catch (err) {
-    console.error('Error updating manuscript file:', err);
-    throw new Error('An error occurred while updating the manuscript file.');
-  }
+// Function to update manuscript file details
+export const updateManuscriptFile = async (manuscriptId: number, filePath: string, user_id: string) => {
+  // Update the manuscript record with the provided file path and userId
+  await pool.query(
+    'UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?',
+    [filePath, user_id, manuscriptId]
+  );
 };
 
 // Function to update article details
