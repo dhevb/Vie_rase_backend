@@ -6,22 +6,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const multer_1 = __importDefault(require("multer"));
 const manuscriptController_1 = require("../controllers/manuscriptController");
-// Configure multer to use memory storage
-const storage = multer_1.default.memoryStorage();
+// Setup multer for file uploads
 const upload = (0, multer_1.default)({
-    storage: storage,
-    limits: { fileSize: 100 * 1024 * 1024 }, // 100 MB limit for manuscript files
+    dest: 'uploads/',
+    limits: { fileSize: 100 * 1024 * 1024 }, // 10 MB
     fileFilter(req, file, cb) {
         if (file.mimetype !== 'application/msword' && file.mimetype !== 'application/vnd.openxmlformats-officedocument.wordprocessingml.document') {
-            return cb(new Error('Only .doc and .docx files are allowed.'));
+            return cb(new Error('Only .doc and .docx files are allowed'));
         }
         cb(null, true);
     }
 });
 const router = express_1.default.Router();
-// Route for submitting author details
 router.post('/api/submit-author-details', manuscriptController_1.submitAuthorDetailsController);
-// Route for submitting manuscript file with Vercel Blob integration
+// Route for submitting manuscript file
 router.post('/api/submit-manuscript-file', upload.single('file'), manuscriptController_1.submitManuscriptFileController);
 // Route for submitting article details
 router.post('/api/submit-article-details', manuscriptController_1.submitArticleDetailsController);

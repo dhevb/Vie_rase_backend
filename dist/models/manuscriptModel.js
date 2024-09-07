@@ -11,28 +11,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateArticleDetails = exports.updateManuscriptFile = exports.submitAuthorDetails = void 0;
 const db_1 = require("../utils/db"); // Adjust path as necessary
-// Function to submit author and co-author details
 const submitAuthorDetails = (data) => __awaiter(void 0, void 0, void 0, function* () {
     // Insert author and co-author details into the database
     const [result] = yield db_1.pool.query('INSERT INTO manuscript (author_name, author_email, author_designation, author_organization, author_mobile, userId) VALUES (?, ?, ?, ?, ?, ?)', [data.author_name, data.author_email, data.author_designation, data.author_organization, data.author_mobile, data.user_id]);
     const manuscriptId = result.insertId;
-    // Insert co-authors into the co_authors table
+    // Insert co-authors
     for (const coAuthor of data.co_authors) {
         yield db_1.pool.query('INSERT INTO co_authors (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)', [manuscriptId, coAuthor.name, coAuthor.email, coAuthor.designation, coAuthor.organization, coAuthor.mobile]);
     }
     return { manuscriptId };
 });
 exports.submitAuthorDetails = submitAuthorDetails;
-// Function to update manuscript file details with Vercel Blob URL
-const updateManuscriptFile = (manuscriptId, fileUrl, user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    try {
-        // Update the manuscript table with the file URL instead of the file buffer
-        yield db_1.pool.query('UPDATE manuscript SET filePath = ?, userId = ? WHERE id = ?', [fileUrl, user_id, manuscriptId]);
-    }
-    catch (err) {
-        console.error('Error updating manuscript file:', err);
-        throw new Error('An error occurred while updating the manuscript file.');
-    }
+// Function to update manuscript file details
+const updateManuscriptFile = (manuscriptId, filePath, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    // Update the manuscript record with the provided file path and userId
+    yield db_1.pool.query('UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?', [filePath, user_id, manuscriptId]);
 });
 exports.updateManuscriptFile = updateManuscriptFile;
 // Function to update article details
