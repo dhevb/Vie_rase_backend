@@ -16,7 +16,7 @@ const upload = multer({
 
 const router = express.Router();
 
-// Route for submitting author details
+
 router.post('/api/submit-author-details', submitAuthorDetailsController);
 
 // Route for submitting manuscript file
