@@ -66,7 +66,7 @@ const submitManuscriptFileController = (req, res) => __awaiter(void 0, void 0, v
         const response = yield axios_1.default.post('https://api.vercel.com/v2/blob', fileBuffer, {
             headers: {
                 'Content-Type': mimetype,
-                'Authorization': `Bearer YOUR_VERCEL_ACCESS_TOKEN`, // Replace with your Vercel access token
+                'Authorization': process.env.MANUSCRIPT_TOKEN, // Replace with your Vercel access token
             },
             params: {
                 fileName: originalname,
