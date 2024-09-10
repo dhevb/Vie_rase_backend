@@ -81,10 +81,14 @@ export const submitManuscriptFileController = async (req: Request, res: Response
 // Controller to handle article details submission
 export const submitArticleDetailsController = async (req: Request, res: Response) => {
   try {
-   
+    const manuscriptId = Number(req.body.manuscriptId);
     const user_id = req.body.userId; // Extract userId from request body
 
-   
+    if (isNaN(manuscriptId) || manuscriptId <= 0) {
+      console.warn('Invalid manuscript ID:', manuscriptId); // Debugging
+      return res.status(400).json({ error: 'Invalid manuscript ID. Please provide a valid manuscript ID.' });
+    }
+
     if (!user_id) {
       console.warn('User ID not provided'); // Debugging
       return res.status(400).json({ error: 'User ID is required.' });
@@ -92,7 +96,7 @@ export const submitArticleDetailsController = async (req: Request, res: Response
 
     console.log('Received article details:', req.body); // Debugging
 
-    await updateArticleDetails(req.body, user_id); // Pass userId to the model
+    await updateArticleDetails(manuscriptId, req.body, user_id); // Pass userId to the model
     res.status(200).json({ message: 'Article details submitted successfully' });
   } catch (err) {
     console.error('Error submitting article details:', err); // Debugging
