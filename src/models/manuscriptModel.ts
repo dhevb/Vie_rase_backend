@@ -45,10 +45,10 @@ export const updateManuscriptFile = async (manuscriptId: number, filePath: strin
 };
 
 // Function to update article details
-export const updateArticleDetails = async (manuscriptId: number, details: any, user_id: string) => {
+export const updateArticleDetails = async (details: any, user_id: string) => {
   // Update the manuscript record with the provided article details and userId
   await pool.query(
     'UPDATE manuscript SET title = ?, abstract = ?, category = ?, userId = ? WHERE id = ?',
-    [details.title, details.abstract, details.category, user_id, manuscriptId]
+    [details.title, details.abstract, details.category, user_id]
   );
 };
