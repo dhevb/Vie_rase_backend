@@ -35,7 +35,7 @@ const updateArticleDetails = (manuscriptId, details, user_id) => __awaiter(void 
 exports.updateArticleDetails = updateArticleDetails;
 // Function to fetch all manuscripts by a user
 const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // Query to fetch manuscripts for the user with author details, file path, article details, and submission date
+    // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
     const [manuscripts] = yield db_1.pool.query(`
       SELECT 
         m.id as manuscript_id,
@@ -49,7 +49,7 @@ const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, funct
         m.abstract as article_abstract,
         m.category as article_category,
         m.keywords as article_keywords,
-        m.submission_date,
+        DATE_FORMAT(m.created_at, '%Y-%m-%d') as submission_date, -- Format created_at to get submission date
         JSON_ARRAYAGG(
           JSON_OBJECT(
             'name', c.name,
@@ -63,7 +63,7 @@ const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, funct
       LEFT JOIN co_authors c ON m.id = c.manuscriptId
       WHERE m.userId = ?
       GROUP BY m.id
-      ORDER BY m.submission_date DESC
+      ORDER BY m.created_at DESC
     `, [userId]);
     return manuscripts;
 });
