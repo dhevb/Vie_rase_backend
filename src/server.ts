@@ -8,6 +8,7 @@ import { updatePassword } from './controllers/authController';
 import { submitArticleDetailsController } from './controllers/manuscriptController';
 import {submitAuthorDetailsController } from './controllers/manuscriptController';
 import { submitManuscriptFileController } from './controllers/manuscriptController';
+import { getManuscriptsByUserController } from './controllers/manuscriptController';
 import {logout} from './controllers/authController';
 import {checkAuth} from './controllers/authController';
 import multer from 'multer';
@@ -22,6 +23,7 @@ app.use('/api/reset-password', updatePassword);
 app.use('/api/submit-manuscript-file',  upload.single('file'), submitManuscriptFileController);
 app.use('/api/submit-article-details', submitArticleDetailsController);
 app.use('/api/submit-author-details', submitAuthorDetailsController);
+app.use('/api/manuscripts/user/:userId', getManuscriptsByUserController)
 app.use('/api/login', login);
 app.use('/api/signup', signup);
 app.use('/api/logout', logout);

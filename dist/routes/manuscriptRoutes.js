@@ -23,4 +23,6 @@ router.post('/api/submit-author-details', manuscriptController_1.submitAuthorDet
 router.post('/api/submit-manuscript-file', upload.single('file'), manuscriptController_1.submitManuscriptFileController);
 // Route for submitting article details
 router.post('/api/submit-article-details', manuscriptController_1.submitArticleDetailsController);
+// Route for getting manuscript details
+router.get('/api/manuscripts/user/:userId', manuscriptController_1.getManuscriptsByUserController);
 exports.default = router;

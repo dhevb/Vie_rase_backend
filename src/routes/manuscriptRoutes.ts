@@ -1,6 +1,6 @@
 import express from 'express';
 import multer from 'multer';
-import { submitAuthorDetailsController, submitManuscriptFileController, submitArticleDetailsController } from '../controllers/manuscriptController';
+import { submitAuthorDetailsController, getManuscriptsByUserController, submitManuscriptFileController, submitArticleDetailsController } from '../controllers/manuscriptController';
 
 // Setup multer for file uploads
 const upload = multer({
@@ -24,6 +24,7 @@ router.post('/api/submit-manuscript-file', upload.single('file'), submitManuscri
 
 // Route for submitting article details
 router.post('/api/submit-article-details', submitArticleDetailsController);
-
+// Route for getting manuscript details
+router.get('/api/manuscripts/user/:userId', getManuscriptsByUserController);
 export default router;
 
