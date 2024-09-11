@@ -58,18 +58,18 @@ export const getManuscriptsByUser = async (userId: string) => {
   const [manuscripts] = await pool.query(
     `
       SELECT 
-        m.id as manuscript_id,
-        m.author_name,
-        m.author_email,
-        m.author_designation,
-        m.author_organization,
-        m.author_mobile,
-        m.file_path,
-        m.title as article_title,
-        m.abstract as article_abstract,
-        m.category as article_category,
-        m.keywords as article_keywords,
-        DATE_FORMAT(m.created_at, '%Y-%m-%d') as submission_date, -- Format created_at to get submission date
+        m.id as id,
+        m.title as title,
+        m.abstract as abstract,
+        m.category as category,
+        m.keywords as keywords,
+        m.file_path as file_path,
+        DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_at, -- Format created_at to get submission date
+        m.author_name as author_name,
+        m.author_email as author_email,
+        m.author_designation as author_designation,
+        m.author_organization as author_organization,
+        m.author_mobile as author_mobile,
         JSON_ARRAYAGG(
           JSON_OBJECT(
             'name', c.name,
