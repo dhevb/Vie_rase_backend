@@ -16,6 +16,9 @@ const manuscriptController_3 = require("./controllers/manuscriptController");
 const manuscriptController_4 = require("./controllers/manuscriptController");
 const authController_4 = require("./controllers/authController");
 const authController_5 = require("./controllers/authController");
+const AddArticleController_1 = require("./controllers/AddArticleController");
+const AddArticleController_2 = require("./controllers/AddArticleController");
+const AddArticleController_3 = require("./controllers/AddArticleController");
 const multer_1 = __importDefault(require("multer"));
 const app = (0, express_1.default)();
 const port = process.env.PORT || 3000;
@@ -33,6 +36,9 @@ app.use('/api/signup', authController_2.signup);
 app.use('/api/logout', authController_4.logout);
 app.use('/api/checkAuth', authController_5.checkAuth);
 app.use('/api/reset-password', authController_3.updatePassword);
+app.use('/api/add-article', AddArticleController_1.saveArticleDetailsController);
+app.use('/api/getallarticles', AddArticleController_2.getAllArticlesController);
+app.use('/api/getarticle/:id', AddArticleController_3.getArticleByIdController);
 (0, db_1.connectToDatabase)(); // Verify database connection
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

@@ -52,41 +52,49 @@ export const updateArticleDetails = async (manuscriptId: number, details: any, u
 };
 
 
-// Function to fetch all manuscripts by a user
+/// Function to fetch all manuscripts by a user
 export const getManuscriptsByUser = async (userId: string) => {
-  // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
-  const [manuscripts] = await pool.query(
-    `
-      SELECT 
-        m.id as id,
-        m.title as title,
-        m.abstract as abstract,
-        m.category as category,
-        m.keywords as keywords,
-        m.file_path as file_path,
-        DATE_FORMAT(m.created_at, '%Y-%m-%d') as created_at, -- Format created_at to get submission date
-        m.author_name as author_name,
-        m.author_email as author_email,
-        m.author_designation as author_designation,
-        m.author_organization as author_organization,
-        m.author_mobile as author_mobile,
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'name', c.name,
-            'email', c.email,
-            'designation', c.designation,
-            'organization', c.organization,
-            'mobile', c.mobile
-          )
-        ) as co_authors
-      FROM manuscript m
-      LEFT JOIN co_authors c ON m.id = c.manuscriptId
-      WHERE m.userId = ?
-      GROUP BY m.id
-      ORDER BY m.created_at DESC
-    `,
-    [userId]
-  );
+  try {
+    // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
+    const [manuscripts] = await pool.query(
+      `
+        SELECT 
+          m.id AS id,
+          m.title AS title,
+          m.abstract AS abstract,
+          m.category AS category,
+          m.keywords AS keywords,
+          m.file_path AS file_path,
+          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, -- Format created_at to YYYY-MM-DD HH:MM:SS
+          m.author_name AS author_name,
+          m.author_email AS author_email,
+          m.author_designation AS author_designation,
+          m.author_organization AS author_organization,
+          m.author_mobile AS author_mobile,
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'name', c.name,
+              'email', c.email,
+              'designation', c.designation,
+              'organization', c.organization,
+              'mobile', c.mobile
+            )
+          ) AS co_authors
+        FROM manuscript m
+        LEFT JOIN co_authors c ON m.id = c.manuscriptId
+        WHERE m.userId = ?
+        GROUP BY m.id
+        ORDER BY m.created_at DESC
+      `,
+      [userId]
+    );
 
-  return manuscripts;
+    // Log the result to inspect
+    console.log('Fetched manuscripts:', manuscripts);
+
+    return { manuscripts };
+  } catch (error) {
+    console.error('Error fetching manuscripts:', error);
+    throw error;
+  }
 };

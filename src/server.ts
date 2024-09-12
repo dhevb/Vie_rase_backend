@@ -11,6 +11,12 @@ import { submitManuscriptFileController } from './controllers/manuscriptControll
 import { getManuscriptsByUserController } from './controllers/manuscriptController';
 import {logout} from './controllers/authController';
 import {checkAuth} from './controllers/authController';
+import {saveArticleDetailsController} from './controllers/AddArticleController';
+import {getAllArticlesController} from './controllers/AddArticleController'
+import {getArticleByIdController} from './controllers/AddArticleController';
+
+
+
 import multer from 'multer';
 const app = express();
 const port = process.env.PORT || 3000;
@@ -29,8 +35,9 @@ app.use('/api/signup', signup);
 app.use('/api/logout', logout);
 app.use('/api/checkAuth', checkAuth);
 app.use('/api/reset-password', updatePassword);
-
-
+app.use('/api/add-article', saveArticleDetailsController);
+app.use('/api/getallarticles', getAllArticlesController);
+app.use('/api/getarticle/:id', getArticleByIdController);
 connectToDatabase(); // Verify database connection
 
 app.listen(port, () => {

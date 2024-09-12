@@ -33,38 +33,46 @@ const updateArticleDetails = (manuscriptId, details, user_id) => __awaiter(void 
     yield db_1.pool.query('UPDATE manuscript SET title = ?, abstract = ?, category = ?, keywords = ?, userId = ? WHERE id = ?', [details.title, details.abstract, details.category, details.keywords, user_id, manuscriptId]);
 });
 exports.updateArticleDetails = updateArticleDetails;
-// Function to fetch all manuscripts by a user
+/// Function to fetch all manuscripts by a user
 const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
-    // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
-    const [manuscripts] = yield db_1.pool.query(`
-      SELECT 
-        m.id as manuscript_id,
-        m.author_name,
-        m.author_email,
-        m.author_designation,
-        m.author_organization,
-        m.author_mobile,
-        m.file_path,
-        m.title as article_title,
-        m.abstract as article_abstract,
-        m.category as article_category,
-        m.keywords as article_keywords,
-        DATE_FORMAT(m.created_at, '%Y-%m-%d') as submission_date, -- Format created_at to get submission date
-        JSON_ARRAYAGG(
-          JSON_OBJECT(
-            'name', c.name,
-            'email', c.email,
-            'designation', c.designation,
-            'organization', c.organization,
-            'mobile', c.mobile
-          )
-        ) as co_authors
-      FROM manuscript m
-      LEFT JOIN co_authors c ON m.id = c.manuscriptId
-      WHERE m.userId = ?
-      GROUP BY m.id
-      ORDER BY m.created_at DESC
-    `, [userId]);
-    return manuscripts;
+    try {
+        // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
+        const [manuscripts] = yield db_1.pool.query(`
+        SELECT 
+          m.id AS id,
+          m.title AS title,
+          m.abstract AS abstract,
+          m.category AS category,
+          m.keywords AS keywords,
+          m.file_path AS file_path,
+          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, -- Format created_at to YYYY-MM-DD HH:MM:SS
+          m.author_name AS author_name,
+          m.author_email AS author_email,
+          m.author_designation AS author_designation,
+          m.author_organization AS author_organization,
+          m.author_mobile AS author_mobile,
+          JSON_ARRAYAGG(
+            JSON_OBJECT(
+              'name', c.name,
+              'email', c.email,
+              'designation', c.designation,
+              'organization', c.organization,
+              'mobile', c.mobile
+            )
+          ) AS co_authors
+        FROM manuscript m
+        LEFT JOIN co_authors c ON m.id = c.manuscriptId
+        WHERE m.userId = ?
+        GROUP BY m.id
+        ORDER BY m.created_at DESC
+      `, [userId]);
+        // Log the result to inspect
+        console.log('Fetched manuscripts:', manuscripts);
+        return { manuscripts };
+    }
+    catch (error) {
+        console.error('Error fetching manuscripts:', error);
+        throw error;
+    }
 });
 exports.getManuscriptsByUser = getManuscriptsByUser;
