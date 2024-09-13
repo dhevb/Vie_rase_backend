@@ -64,7 +64,7 @@ export const getManuscriptsByUser = async (userId: string) => {
           m.category AS category,
           m.keywords AS keywords,
           m.file_path AS file_path,
-          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, -- Format created_at to YYYY-MM-DD HH:MM:SS
+          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS submission_date, -- Format created_at to YYYY-MM-DD HH:MM:SS
           m.author_name AS author_name,
           m.author_email AS author_email,
           m.author_designation AS author_designation,
