@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { submitAuthorDetails, updateManuscriptFile, updateArticleDetails, getManuscriptsByUser } from '../models/manuscriptModel';
+import { submitAuthorDetails, updateManuscriptFile, updateArticleDetails, getManuscriptsByUser } from '../models/vbe_manuscriptModel';
 
 // Controller to handle author details submission
-export const submitAuthorDetailsController = async (req: Request, res: Response) => {
+export const vbe_submitAuthorDetailsController = async (req: Request, res: Response) => {
   try {
     const {
       author_name,
@@ -43,7 +43,7 @@ export const submitAuthorDetailsController = async (req: Request, res: Response)
 };
 
 // Controller to handle manuscript file upload
-export const submitManuscriptFileController = async (req: Request, res: Response) => {
+export const vbe_submitManuscriptFileController = async (req: Request, res: Response) => {
   try {
     if (!req.file) {
       console.warn('File upload attempt with no file');
@@ -77,7 +77,7 @@ export const submitManuscriptFileController = async (req: Request, res: Response
 };
 
 // Controller to handle article details submission
-export const submitArticleDetailsController = async (req: Request, res: Response) => {
+export const vbe_submitArticleDetailsController = async (req: Request, res: Response) => {
   try {
     const manuscriptId = Number(req.body.manuscriptId);
     const user_id = req.body.userId;
@@ -103,7 +103,7 @@ export const submitArticleDetailsController = async (req: Request, res: Response
 };
 
 // Controller to get all manuscripts submitted by a user
-export const getManuscriptsByUserController = async (req: Request, res: Response) => {
+export const vbe_getManuscriptsByUserController = async (req: Request, res: Response) => {
   try {
     const userId = req.params.userId;
 

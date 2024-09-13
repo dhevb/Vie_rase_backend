@@ -18,7 +18,7 @@ export const submitAuthorDetails = async (data: {
 }) => {
   // Insert author and co-author details into the database
   const [result] = await pool.query(
-    'INSERT INTO manuscript (author_name, author_email, author_designation, author_organization, author_mobile, userId, submission_date) VALUES (?, ?, ?, ?, ?, ?, NOW())',
+    'INSERT INTO manuscript_vbe (author_name, author_email, author_designation, author_organization, author_mobile, userId, submission_date) VALUES (?, ?, ?, ?, ?, ?, NOW())',
     [data.author_name, data.author_email, data.author_designation, data.author_organization, data.author_mobile, data.user_id]
   );
 
@@ -27,7 +27,7 @@ export const submitAuthorDetails = async (data: {
   // Insert co-authors
   for (const coAuthor of data.co_authors) {
     await pool.query(
-      'INSERT INTO co_authors (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)',
+      'INSERT INTO co_authors_vbe (manuscriptId, name, email, designation, organization, mobile) VALUES (?, ?, ?, ?, ?, ?)',
       [manuscriptId, coAuthor.name, coAuthor.email, coAuthor.designation, coAuthor.organization, coAuthor.mobile]
     );
   }
@@ -38,7 +38,7 @@ export const submitAuthorDetails = async (data: {
 // Function to update manuscript file details
 export const updateManuscriptFile = async (manuscriptId: number, filePath: string, user_id: string) => {
   await pool.query(
-    'UPDATE manuscript SET file_path = ?, userId = ? WHERE id = ?',
+    'UPDATE manuscript_vbe SET file_path = ?, userId = ? WHERE id = ?',
     [filePath, user_id, manuscriptId]
   );
 };
@@ -46,7 +46,7 @@ export const updateManuscriptFile = async (manuscriptId: number, filePath: strin
 // Function to update article details
 export const updateArticleDetails = async (manuscriptId: number, details: any, user_id: string) => {
   await pool.query(
-    'UPDATE manuscript SET title = ?, abstract = ?, category = ?, keywords = ?, userId = ? WHERE id = ?',
+    'UPDATE manuscript_vbe SET title = ?, abstract = ?, category = ?, keywords = ?, userId = ? WHERE id = ?',
     [details.title, details.abstract, details.category, details.keywords, user_id, manuscriptId]
   );
 };
@@ -79,9 +79,9 @@ export const getManuscriptsByUser = async (userId: string) => {
               'organization', c.organization,
               'mobile', c.mobile
             )
-          ) AS co_authors
-        FROM manuscript m
-        LEFT JOIN co_authors c ON m.id = c.manuscriptId
+          ) AS co_authors_vbe
+        FROM manuscript_vbe m
+        LEFT JOIN co_authors_vbe c ON m.id = c.manuscriptId
         WHERE m.userId = ?
         GROUP BY m.id
         ORDER BY m.created_at DESC

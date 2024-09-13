@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { saveArticleDetails, getAllArticlesFromDB, getArticleById } from '../models/AddArticleModel';
+import { saveArticleDetails, getAllArticlesFromDB, getArticleById } from '../models/AddArticle_vih_Model';
 
-export const saveArticleDetailsController = async (req: Request, res: Response) => {
+export const vih_saveArticleDetailsController = async (req: Request, res: Response) => {
   try {
     const articleData = req.body;
 
@@ -21,7 +21,7 @@ export const saveArticleDetailsController = async (req: Request, res: Response) 
 };
 
 // New controller function to get all articles
-export const getAllArticlesController = async (req: Request, res: Response) => {
+export const vih_getAllArticlesController = async (req: Request, res: Response) => {
   try {
     const articles = await getAllArticlesFromDB();
     res.status(200).json(articles);
@@ -32,7 +32,7 @@ export const getAllArticlesController = async (req: Request, res: Response) => {
 };
 
 // New controller function to get an article by ID
-export const getArticleByIdController = async (req: Request, res: Response) => {
+export const vih_getArticleByIdController = async (req: Request, res: Response) => {
   try {
     const articleId = parseInt(req.params.id, 10);
 
