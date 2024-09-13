@@ -79,7 +79,7 @@ export const getManuscriptsByUser = async (userId: string) => {
               'organization', c.organization,
               'mobile', c.mobile
             )
-          ) AS co_authors_vie
+          ) AS co_authors
         FROM manuscript_vie m
         LEFT JOIN co_authors_vie c ON m.id = c.manuscriptId
         WHERE m.userId = ?
