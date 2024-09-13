@@ -55,7 +55,6 @@ export const updateArticleDetails = async (manuscriptId: number, details: any, u
 /// Function to fetch all manuscripts by a user
 export const getManuscriptsByUser = async (userId: string) => {
   try {
-    // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
     const [manuscripts] = await pool.query(
       `
         SELECT 
@@ -71,14 +70,21 @@ export const getManuscriptsByUser = async (userId: string) => {
           m.author_designation AS author_designation,
           m.author_organization AS author_organization,
           m.author_mobile AS author_mobile,
-          JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'name', c.name,
-              'email', c.email,
-              'designation', c.designation,
-              'organization', c.organization,
-              'mobile', c.mobile
-            )
+          COALESCE(
+            JSON_ARRAYAGG(
+              IF(
+                c.name IS NOT NULL, 
+                JSON_OBJECT(
+                  'name', c.name,
+                  'email', c.email,
+                  'designation', c.designation,
+                  'organization', c.organization,
+                  'mobile', c.mobile
+                ), 
+                NULL
+              )
+            ), 
+            JSON_ARRAY()
           ) AS co_authors_vbe
         FROM manuscript_vbe m
         LEFT JOIN co_authors_vbe c ON m.id = c.manuscriptId
