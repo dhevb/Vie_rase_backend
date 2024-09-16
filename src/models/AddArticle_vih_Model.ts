@@ -35,54 +35,63 @@ interface ArticleData {
   }>;
   Conclusion: string;
   Recommendations: string;
+  Refrences:string;
 }
 
+// Function to save article details
 export const saveArticleDetails = async (articleData: ArticleData): Promise<number> => {
-  try {
-    const [result] = await pool.query<ResultSetHeader>(
-      `INSERT INTO article (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations) 
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-      [
-        articleData.DOI,
-        JSON.stringify(articleData.ArticleInfo),
-        JSON.stringify(articleData.ArticleDetails),
-        articleData.Abstract,
-        articleData.Keywords,
-        JSON.stringify(articleData.Heading),
-        articleData.Conclusion,
-        articleData.Recommendations,
-      ]
-    );
+  let attempts = 0;
+  const maxAttempts = 3;
 
-    // Access insertId from ResultSetHeader
-    const articleId = result.insertId;
-    return articleId;
-  } catch (err) {
-    // Ensure the error is of type Error
-    if (err instanceof Error) {
-      throw new Error('Error saving article details: ' + err.message);
-    } else {
-      throw new Error('Unknown error occurred while saving article details.');
+  while (attempts < maxAttempts) {
+    try {
+      const [result] = await pool.query<ResultSetHeader>(
+        `INSERT INTO article_vih (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations,Refrences) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        [
+          articleData.DOI,
+          JSON.stringify(articleData.ArticleInfo),
+          JSON.stringify(articleData.ArticleDetails),
+          articleData.Abstract,
+          articleData.Keywords,
+          JSON.stringify(articleData.Heading),
+          articleData.Conclusion,
+          articleData.Recommendations,
+          articleData.Refrences
+        ]
+      );
+
+      // Return the insertId of the newly inserted article
+      return result.insertId;
+
+    } catch (err) {
+      attempts++;
+      if (attempts >= maxAttempts || !(err instanceof Error)) {
+        throw new Error('Error saving article details: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      }
+      console.log(`Attempt ${attempts} failed. Retrying...`);
     }
   }
+
+  throw new Error('Max retry attempts reached for saving article details.');
 };
 
 // Function to get all articles from the database
 export const getAllArticlesFromDB = async (): Promise<{ id: number; title: string }[]> => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article'
+      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article_vih'
     );
 
     // Transform rows to the desired format
     const articles = rows.map(row => ({
       id: row.id,
-      title: row.title
+      title: row.title,
     }));
 
     return articles;
+
   } catch (err) {
-    // Ensure the error is of type Error
     if (err instanceof Error) {
       throw new Error('Error retrieving articles from DB: ' + err.message);
     } else {
@@ -95,7 +104,7 @@ export const getAllArticlesFromDB = async (): Promise<{ id: number; title: strin
 export const getArticleById = async (id: number): Promise<ArticleData | null> => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM article WHERE id = ?',
+      'SELECT * FROM article_vih WHERE id = ?',
       [id]
     );
 
@@ -103,7 +112,8 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
       return null; // No article found with the given ID
     }
 
-    const article = rows[0] as RowDataPacket; // Assuming single row result
+    const article = rows[0] as RowDataPacket;
+
     return {
       DOI: article.DOI,
       ArticleInfo: JSON.parse(article.ArticleInfo as string),
@@ -113,9 +123,9 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
       Heading: JSON.parse(article.Heading as string),
       Conclusion: article.Conclusion,
       Recommendations: article.Recommendations,
+      Refrences:article.Refrences
     };
   } catch (err) {
-    // Ensure the error is of type Error
     if (err instanceof Error) {
       throw new Error('Error retrieving article from DB: ' + err.message);
     } else {
