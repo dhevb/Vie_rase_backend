@@ -51,7 +51,7 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
   while (attempts < maxAttempts) {
     try {
       const [result] = await pool.query<ResultSetHeader>(
-        `INSERT INTO article_vbh (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations, Refrences) 
+        `INSERT INTO article_vie (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations, Refrences) 
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           articleData.DOI,
@@ -85,7 +85,7 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
 export const getAllArticlesFromDB = async (): Promise<{ id: number; title: string }[]> => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article_vbh'
+      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article_vie'
     );
 
     // Transform rows to the desired format
@@ -107,19 +107,23 @@ export const getAllArticlesFromDB = async (): Promise<{ id: number; title: strin
 
 // Function to get an article by its ID
 export const getArticleById = async (id: number): Promise<ArticleData | null> => {
+  console.log(`Fetching article with ID: ${id}`);
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM article_vbh WHERE id = ?',
+      'SELECT * FROM article_vie WHERE id = ?',
       [id]
     );
 
+    console.log(`Query result: ${JSON.stringify(rows)}`);
+
     if (rows.length === 0) {
+      console.log('No article found with the given ID.');
       return null; // No article found with the given ID
     }
 
     const article = rows[0] as RowDataPacket;
 
-    return {
+    const result: ArticleData = {
       DOI: article.DOI,
       ArticleInfo: JSON.parse(article.ArticleInfo as string),
       ArticleDetails: JSON.parse(article.ArticleDetails as string),
@@ -130,10 +134,16 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
       Recommendations: article.Recommendations,
       Refrences: JSON.parse(article.Refrences as string) // Parse references from JSON
     };
+
+    console.log('Fetched article data:', result);
+
+    return result;
   } catch (err) {
     if (err instanceof Error) {
+      console.error('Error retrieving article from DB:', err.message);
       throw new Error('Error retrieving article from DB: ' + err.message);
     } else {
+      console.error('Unknown error occurred while retrieving article.');
       throw new Error('Unknown error occurred while retrieving article.');
     }
   }
