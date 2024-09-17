@@ -1,6 +1,11 @@
 import { pool } from '../utils/db'; // Adjust the import path as necessary
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
+interface Refrence {
+  text: string;
+  url: string;
+}
+
 interface ArticleData {
   DOI: string;
   ArticleInfo: {
@@ -35,7 +40,7 @@ interface ArticleData {
   }>;
   Conclusion: string;
   Recommendations: string;
-  Refrences:string;
+  Refrences: Refrence[]; // Updated to handle an array of references
 }
 
 // Function to save article details
@@ -46,8 +51,8 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
   while (attempts < maxAttempts) {
     try {
       const [result] = await pool.query<ResultSetHeader>(
-        `INSERT INTO article_vie (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations,Refrences) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?,?)`,
+        `INSERT INTO article_vbe (DOI, ArticleInfo, ArticleDetails, Abstract, Keywords, Heading, Conclusion, Recommendations, Refrences) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           articleData.DOI,
           JSON.stringify(articleData.ArticleInfo),
@@ -57,7 +62,7 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
           JSON.stringify(articleData.Heading),
           articleData.Conclusion,
           articleData.Recommendations,
-          articleData.Refrences
+          JSON.stringify(articleData.Refrences) // Convert references to JSON
         ]
       );
 
@@ -80,7 +85,7 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
 export const getAllArticlesFromDB = async (): Promise<{ id: number; title: string }[]> => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article_vie'
+      'SELECT id, JSON_UNQUOTE(JSON_EXTRACT(ArticleDetails, "$.Title")) AS title FROM article_vbe'
     );
 
     // Transform rows to the desired format
@@ -104,7 +109,7 @@ export const getAllArticlesFromDB = async (): Promise<{ id: number; title: strin
 export const getArticleById = async (id: number): Promise<ArticleData | null> => {
   try {
     const [rows] = await pool.query<RowDataPacket[]>(
-      'SELECT * FROM article_vie WHERE id = ?',
+      'SELECT * FROM article_vbe WHERE id = ?',
       [id]
     );
 
@@ -123,7 +128,7 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
       Heading: JSON.parse(article.Heading as string),
       Conclusion: article.Conclusion,
       Recommendations: article.Recommendations,
-      Refrences:article.Refrences
+      Refrences: JSON.parse(article.Refrences as string) // Parse references from JSON
     };
   } catch (err) {
     if (err instanceof Error) {
