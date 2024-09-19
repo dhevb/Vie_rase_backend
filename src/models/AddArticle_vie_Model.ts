@@ -123,13 +123,14 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
 
     const article = rows[0] as RowDataPacket;
 
+    // Make sure to parse the JSON fields
     const result: ArticleData = {
       DOI: article.DOI,
-      ArticleInfo: JSON.parse(article.ArticleInfo as string),
-      ArticleDetails: JSON.parse(article.ArticleDetails as string),
+      ArticleInfo: JSON.parse(article.ArticleInfo as string), // Parse JSON
+      ArticleDetails: JSON.parse(article.ArticleDetails as string), // Parse JSON
       Abstract: article.Abstract,
       Keywords: article.Keywords,
-      Heading: JSON.parse(article.Heading as string),
+      Heading: JSON.parse(article.Heading as string), // Parse JSON
       Conclusion: article.Conclusion,
       Recommendations: article.Recommendations,
       Refrences: JSON.parse(article.Refrences as string) // Parse references from JSON
