@@ -36,7 +36,6 @@ exports.updateArticleDetails = updateArticleDetails;
 /// Function to fetch all manuscripts by a user
 const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        // Query to fetch manuscripts for the user with author details, file path, article details, and formatted created_at date
         const [manuscripts] = yield db_1.pool.query(`
         SELECT 
           m.id AS id,
@@ -45,26 +44,30 @@ const getManuscriptsByUser = (userId) => __awaiter(void 0, void 0, void 0, funct
           m.category AS category,
           m.keywords AS keywords,
           m.file_path AS file_path,
-          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS created_at, -- Format created_at to YYYY-MM-DD HH:MM:SS
+          DATE_FORMAT(m.created_at, '%Y-%m-%d %H:%i:%s') AS submission_date,
           m.author_name AS author_name,
           m.author_email AS author_email,
           m.author_designation AS author_designation,
           m.author_organization AS author_organization,
           m.author_mobile AS author_mobile,
-          JSON_ARRAYAGG(
-            JSON_OBJECT(
-              'name', c.name,
-              'email', c.email,
-              'designation', c.designation,
-              'organization', c.organization,
-              'mobile', c.mobile
-            )
-          ) AS co_authors_vbe
+          -- Use GROUP_CONCAT for co-authors
+          IFNULL(
+            GROUP_CONCAT(
+              CONCAT(
+                '{"name": "', IFNULL(c.name, ''), '", ',
+                '"email": "', IFNULL(c.email, ''), '", ',
+                '"designation": "', IFNULL(c.designation, ''), '", ',
+                '"organization": "', IFNULL(c.organization, ''), '", ',
+                '"mobile": "', IFNULL(c.mobile, ''), '"}'
+              )
+              SEPARATOR ','
+            ), '[]'
+          ) AS co_authors
         FROM manuscript_vbe m
         LEFT JOIN co_authors_vbe c ON m.id = c.manuscriptId
         WHERE m.userId = ?
         GROUP BY m.id
-        ORDER BY m.created_at DESC
+        ORDER BY m.created_at DESC;
       `, [userId]);
         // Log the result to inspect
         console.log('Fetched manuscripts:', manuscripts);
