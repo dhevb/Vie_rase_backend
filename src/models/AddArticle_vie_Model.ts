@@ -1,7 +1,7 @@
 import { pool } from '../utils/db'; // Adjust the import path as necessary
 import { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-interface Reference {
+interface Refrence {
   text: string;
   url: string;
 }
@@ -40,7 +40,7 @@ interface ArticleData {
   }>;
   Conclusion: string;
   Recommendations: string;
-  References: Reference[]; // Updated to handle an array of references
+  Refrences: Refrence[]; // Updated to handle an array of references
 }
 
 // Function to save article details
@@ -62,7 +62,7 @@ export const saveArticleDetails = async (articleData: ArticleData): Promise<numb
           JSON.stringify(articleData.Heading),
           articleData.Conclusion,
           articleData.Recommendations,
-          JSON.stringify(articleData.References) // Convert references to JSON
+          JSON.stringify(articleData.Refrences) // Convert references to JSON
         ]
       );
 
@@ -133,7 +133,7 @@ export const getArticleById = async (id: number): Promise<ArticleData | null> =>
       Heading: JSON.parse(article.Heading as string), // Parse JSON
       Conclusion: article.Conclusion,
       Recommendations: article.Recommendations,
-      References: JSON.parse(article.References as string) // Parse references from JSON
+      Refrences: JSON.parse(article.Refrences as string) // Parse references from JSON
     };
 
     console.log('Fetched article data:', result);
