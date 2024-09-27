@@ -5,5 +5,5 @@ const router = Router();
 
 router.post('/api/vih_add-article', vih_saveArticleDetailsController);
 router.get('/api/vih_getallarticles', vih_getAllArticlesController);
-router.get('/api/vihgetarticle/:id', vih_getArticleByIdController); // New route
+router.get('/api/vih_getarticle/:id', vih_getArticleByIdController); // New route
 export default router;
