@@ -36,12 +36,14 @@ export const submitAuthorDetails = async (data: {
 };
 
 // Function to update manuscript file details
-export const updateManuscriptFile = async (manuscriptId: number, filePath: string, user_id: string) => {
+// Modify to accept Buffer for file
+export const updateManuscriptFile = async (manuscriptId: number, fileBuffer: Buffer, user_id: string) => {
   await pool.query(
     'UPDATE manuscript_vbe SET file_path = ?, userId = ? WHERE id = ?',
-    [filePath, user_id, manuscriptId]
+    [fileBuffer, user_id, manuscriptId]
   );
 };
+
 
 // Function to update article details
 export const updateArticleDetails = async (manuscriptId: number, details: any, user_id: string) => {
