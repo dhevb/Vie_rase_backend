@@ -1,8 +1,18 @@
 {
-    "build": {
-      "env": {
-        "NODE_ENV": "production"
+    "builds": [
+      {
+        "src": "src/server.ts",
+        "use": "@vercel/node",
+        "config": {
+          "includeFiles": ["dist/**"]
+        }
       }
-    }
+    ],
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/dist/server.js"
+      }
+    ]
   }
   
