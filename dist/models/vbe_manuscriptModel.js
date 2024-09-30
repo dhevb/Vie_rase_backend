@@ -24,8 +24,9 @@ const submitAuthorDetails = (data) => __awaiter(void 0, void 0, void 0, function
 });
 exports.submitAuthorDetails = submitAuthorDetails;
 // Function to update manuscript file details
-const updateManuscriptFile = (manuscriptId, filePath, user_id) => __awaiter(void 0, void 0, void 0, function* () {
-    yield db_1.pool.query('UPDATE manuscript_vbe SET file_path = ?, userId = ? WHERE id = ?', [filePath, user_id, manuscriptId]);
+// Modify to accept Buffer for file
+const updateManuscriptFile = (manuscriptId, fileBuffer, user_id) => __awaiter(void 0, void 0, void 0, function* () {
+    yield db_1.pool.query('UPDATE manuscript_vbe SET file_path = ?, userId = ? WHERE id = ?', [fileBuffer, user_id, manuscriptId]);
 });
 exports.updateManuscriptFile = updateManuscriptFile;
 // Function to update article details
